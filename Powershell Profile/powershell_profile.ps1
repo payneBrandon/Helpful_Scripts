@@ -81,6 +81,33 @@ function glog([string]$base, [string]$target) {
   Write-Host "Commits in $target that are not in $base :"
   Invoke-Expression "& $cmd"
 }
+
+<#
+Launches the Brave browser with CORS disabled.
+
+.DESCRIPTION
+This function starts the Brave browser with a specified URL and disables web security to bypass CORS restrictions. 
+If no URL is provided, it defaults to "https://localhost:8080".
+
+.PARAMETER url
+The URL to open in the Brave browser. If not specified, defaults to "https://localhost:8080".
+
+.EXAMPLE
+brave_no_cors "https://example.com"
+This will open the Brave browser with CORS disabled and navigate to "https://example.com".
+
+.EXAMPLE
+brave_no_cors
+This will open the Brave browser with CORS disabled and navigate to "https://localhost:8080".
+#>
+function brave_no_cors([string] $url) {
+  if ($url -eq $null -or $url -eq "") {
+    $url = "https://localhost:8080"
+  }
+  $argList = '--user-data-dir="c://Chrome dev session" --disable-web-security "{0}"' -f $url
+
+  Start-Process brave -ArgumentList $argList
+}
   
 #oh-my-posh: Initializes oh-my-posh with a specific shell and configuration.
 # --- https://ohmyposh.dev/docs/installation/windows ---
