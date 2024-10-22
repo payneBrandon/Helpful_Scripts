@@ -108,6 +108,38 @@ function brave_no_cors([string] $url) {
 
   Start-Process brave -ArgumentList $argList
 }
+
+# 
+# Function: Git-Checkout
+# 
+# Description:
+# This function simplifies the process of checking out a Git branch. It optionally performs a hard reset before checking out the branch and pulling the latest changes.
+# 
+# Parameters:
+# - [switch]$f: If specified, performs a 'git reset --hard' before checking out the branch.
+# 
+# Usage:
+# Git-Checkout [-f] <branch_name>
+# 
+# Aliases:
+# - gco: Alias for Git-Checkout function.
+# 
+# Example:
+# gco -f main
+# This will perform a hard reset, checkout the 'main' branch, and pull the latest changes.
+function Git-Checkout {
+  param
+  (
+    [switch]$f
+  )
+  
+  if ($f) {
+    git reset --hard
+  }
+  git checkout $args
+  git pull
+}
+Set-Alias -Name gco -Value Git-Checkout -Option AllScope -Force
   
 #oh-my-posh: Initializes oh-my-posh with a specific shell and configuration.
 # --- https://ohmyposh.dev/docs/installation/windows ---
