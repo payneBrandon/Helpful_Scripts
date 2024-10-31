@@ -178,4 +178,57 @@ $env:PYTHONIOENCODING = 'utf-8'
 #iex: Executes the alias for the `thefuck` command.
 # --- https://github.com/nvbn/thefuck ---
 iex "$(thefuck --alias)"
-  
+
+function bitshift {
+  param(
+      [Parameter(Mandatory,Position=0)]
+      [int]$x,
+
+      [Parameter(ParameterSetName='Left')]
+      [ValidateRange(0,[int]::MaxValue)]
+      [int]$Left,
+
+      [Parameter(ParameterSetName='Right')]
+      [ValidateRange(0,[int]::MaxValue)]
+      [int]$Right
+  ) 
+
+  $shift = if($PSCmdlet.ParameterSetName -eq 'Left')
+  { 
+      $Left
+  }
+  else
+  {
+      -$Right
+  }
+
+  return [math]::Floor($x * [math]::Pow(2,$shift))
+}
+
+function Convert-HexToTwosCompInt {
+  param (
+    [string]$hexStr
+  )
+
+  $numBits = $hexStr.Length * 4
+
+  # Convert the hex string to an integer, interpreting it as unsigned
+  $value = [Convert]::ToUInt32($hexStr, 16)
+
+  # If the most significant bit is set, it's a negative number
+  if (($value -band (bitshift 1 -left ($numBits - 1))) -ne 0) {
+    $value -= bitshift 1 -left $numBits
+  }
+
+  return $value
+}
+
+function Convert-TwosCompIntToHex {
+  param (
+    [int]$intValue
+  )
+  # Convert the integer to a hexadecimal string
+  $hexStr = "{0:X}" -f $intValue
+
+  return $hexStr
+}
