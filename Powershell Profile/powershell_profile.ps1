@@ -136,7 +136,9 @@ function Git-Checkout {
   if ($f) {
     git reset --hard
   }
-  git checkout $args
+  if ($args.Count -gt 0) {
+    git checkout $args 
+  }
   git pull
 }
 Set-Alias -Name gco -Value Git-Checkout -Option AllScope -Force
