@@ -16,6 +16,11 @@ The PowerShell profile script contains the following functions:
 #>
 function cbt {
   $sln = Get-ChildItem -Path .\ -Filter *.sln -Recurse -File -Name
+  # check if we have multiple sln and pick the first one
+  if ($sln.Count -gt 1) {
+    Write-Host "Multiple solution files found. Using the first one: $($sln[0])"
+    $sln = $sln[0]
+  } 
   dotnet clean $sln;
   dotnet build $sln;
   dotnet test $sln -p:CollectCoverage=true -e:CoverletOutputFormat=lcov -e:CoverletOutput=./lcov.info;
@@ -103,9 +108,12 @@ This will open the Brave browser with CORS disabled and navigate to "https://loc
 function brave_no_cors([string] $url) {
   if ($url -eq $null -or $url -eq "") {
     $url = "https://localhost:8080"
+  } elseif ($url -notmatch '^http?') {
+    $url = "http://$url"
   }
   $argList = '--user-data-dir="c://Chrome dev session" --disable-web-security "{0}"' -f $url
-
+  # print the command to the console
+  Write-Host "Starting Brave with the following arguments: $argList"
   Start-Process brave -ArgumentList $argList
 }
 
@@ -183,28 +191,26 @@ iex "$(thefuck --alias)"
 
 function bitshift {
   param(
-      [Parameter(Mandatory,Position=0)]
-      [int]$x,
+    [Parameter(Mandatory, Position = 0)]
+    [int]$x,
 
-      [Parameter(ParameterSetName='Left')]
-      [ValidateRange(0,[int]::MaxValue)]
-      [int]$Left,
+    [Parameter(ParameterSetName = 'Left')]
+    [ValidateRange(0, [int]::MaxValue)]
+    [int]$Left,
 
-      [Parameter(ParameterSetName='Right')]
-      [ValidateRange(0,[int]::MaxValue)]
-      [int]$Right
+    [Parameter(ParameterSetName = 'Right')]
+    [ValidateRange(0, [int]::MaxValue)]
+    [int]$Right
   ) 
 
-  $shift = if($PSCmdlet.ParameterSetName -eq 'Left')
-  { 
-      $Left
+  $shift = if ($PSCmdlet.ParameterSetName -eq 'Left') { 
+    $Left
   }
-  else
-  {
-      -$Right
+  else {
+    - $Right
   }
 
-  return [math]::Floor($x * [math]::Pow(2,$shift))
+  return [math]::Floor($x * [math]::Pow(2, $shift))
 }
 
 function Convert-HexToTwosCompInt {
